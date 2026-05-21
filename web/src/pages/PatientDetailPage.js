@@ -1,0 +1,43 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, ArrowRightLeft, Cake, Calendar, ClipboardCheck, Droplet, Mail, Pencil, Phone, Pill, ShieldAlert, User, } from "lucide-react";
+import { api } from "../api/client";
+import { MoveTenantDialog } from "../components/MoveTenantDialog";
+import { NewPatientModal } from "../components/NewPatientModal";
+import { PatientInsuranceSection } from "../components/PatientInsuranceSection";
+import { Avatar } from "../components/ui/Avatar";
+import { Badge, statusTone } from "../components/ui/Badge";
+import { Card, CardBody, CardHeader } from "../components/ui/Card";
+import { hasPermission, useAuthStore } from "../store/auth";
+export function PatientDetailPage() {
+    const { id } = useParams();
+    const [editOpen, setEditOpen] = useState(false);
+    const [moveOpen, setMoveOpen] = useState(false);
+    const isSuper = (useAuthStore.getState().user?.roles || []).includes("super_admin");
+    const canEdit = hasPermission("patients:write");
+    const { data: patient } = useQuery({
+        queryKey: ["patient", id],
+        queryFn: async () => (await api.get(`/patients/${id}`)).data,
+        enabled: !!id,
+    });
+    const { data: timeline } = useQuery({
+        queryKey: ["patient-timeline", id],
+        queryFn: async () => (await api.get(`/patients/${id}/timeline`)).data,
+        enabled: !!id,
+    });
+    const { data: kyc } = useQuery({
+        queryKey: ["patient-kyc", id],
+        queryFn: async () => (await api.get(`/kyc/patients/${id}`)).data,
+        enabled: !!id,
+    });
+    return (_jsxs("div", { className: "max-w-6xl mx-auto space-y-6", children: [_jsxs(Link, { to: "/patients", className: "inline-flex items-center gap-1 text-xs text-ink-500 hover:text-ink-700", children: [_jsx(ArrowLeft, { size: 12 }), " Back to patients"] }), _jsx(Card, { children: _jsx(CardBody, { children: !patient ? (_jsx("div", { className: "h-24 bg-ink-100 rounded animate-pulse" })) : (_jsxs("div", { className: "flex items-start gap-5", children: [_jsx(Avatar, { name: patient.full_name_en, size: "xl", ring: true }), _jsxs("div", { className: "flex-1 min-w-0", children: [_jsxs("div", { className: "flex items-start justify-between gap-3 flex-wrap", children: [_jsxs("div", { children: [_jsx("h1", { className: "text-xl font-semibold text-ink-900", children: patient.full_name_en }), patient.full_name_ar && (_jsx("div", { className: "text-sm text-ink-500 mt-0.5", children: patient.full_name_ar })), _jsx("div", { className: "mt-1 text-xs font-mono text-ink-500", children: patient.code })] }), _jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [_jsxs(Badge, { tone: statusTone(patient.kyc_status), dot: true, pulse: patient.kyc_status === "verified", children: ["KYC ", patient.kyc_status] }), canEdit && (_jsxs("button", { onClick: () => setEditOpen(true), className: "inline-flex items-center gap-1 rounded-md bg-ink-100 hover:bg-ink-200 text-ink-700 text-xs font-medium px-2.5 py-1 transition", children: [_jsx(Pencil, { size: 12 }), " Edit"] })), isSuper && (_jsxs("button", { onClick: () => setMoveOpen(true), className: "inline-flex items-center gap-1 rounded-md bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-medium px-2.5 py-1 transition", children: [_jsx(ArrowRightLeft, { size: 12 }), " Move tenant"] }))] })] }), _jsxs("div", { className: "mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-sm", children: [_jsx(Detail, { icon: _jsx(Phone, { size: 12 }), label: "Phone", value: patient.phone }), _jsx(Detail, { icon: _jsx(Mail, { size: 12 }), label: "Email", value: patient.email }), _jsx(Detail, { icon: _jsx(User, { size: 12 }), label: "National ID", value: patient.national_id, mono: true }), _jsx(Detail, { icon: _jsx(Cake, { size: 12 }), label: "DOB", value: patient.date_of_birth }), _jsx(Detail, { icon: _jsx(User, { size: 12 }), label: "Gender", value: patient.gender }), _jsx(Detail, { icon: _jsx(Droplet, { size: 12 }), label: "Blood type", value: patient.blood_type })] })] })] })) }) }), _jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6", children: [_jsxs(Card, { children: [_jsx(CardHeader, { title: "Medical profile", icon: _jsx(Pill, { size: 16 }) }), _jsx(CardBody, { children: patient ? (_jsxs("div", { className: "space-y-3 text-sm", children: [_jsx(TagGroup, { icon: _jsx(ShieldAlert, { size: 12, className: "text-rose-600" }), label: "Allergies", items: patient.allergies, tone: "bg-rose-50 text-rose-700 ring-rose-200" }), _jsx(TagGroup, { icon: _jsx(ShieldAlert, { size: 12, className: "text-amber-600" }), label: "Chronic", items: patient.chronic_diseases, tone: "bg-amber-50 text-amber-700 ring-amber-200" }), _jsx(TagGroup, { icon: _jsx(Pill, { size: 12, className: "text-brand-600" }), label: "Medications", items: patient.current_medications, tone: "bg-brand-50 text-brand-700 ring-brand-200" }), patient.medical_history_summary && (_jsxs("div", { className: "mt-3 pt-3 border-t border-ink-100", children: [_jsx("div", { className: "text-xs font-semibold text-ink-700 mb-1", children: "History summary" }), _jsx("p", { className: "text-ink-600", children: patient.medical_history_summary })] }))] })) : _jsx(SkelLine, {}) })] }), _jsxs(Card, { children: [_jsx(CardHeader, { title: "KYC", icon: _jsx(ClipboardCheck, { size: 16 }) }), _jsx(CardBody, { children: kyc ? (_jsxs("div", { className: "space-y-3", children: [_jsxs("div", { className: "flex items-center gap-2", children: [_jsx(Badge, { tone: statusTone(kyc.status || "pending"), dot: true, children: kyc.status || "pending" }), kyc.reviewed_at && (_jsxs("span", { className: "text-xs text-ink-500", children: ["Reviewed ", kyc.reviewed_at.slice(0, 16).replace("T", " ")] }))] }), kyc.extracted_payload && (_jsx("pre", { className: "text-[11px] bg-ink-50 border border-ink-100 rounded-lg p-3 overflow-auto max-h-48 font-mono text-ink-700", children: JSON.stringify(kyc.extracted_payload, null, 2) }))] })) : _jsx(SkelLine, {}) })] })] }), id && _jsx(PatientInsuranceSection, { patientId: Number(id) }), _jsxs(Card, { children: [_jsx(CardHeader, { title: "Timeline", icon: _jsx(Calendar, { size: 16 }), description: "Appointments and KYC events" }), _jsx(CardBody, { children: timeline ? (_jsxs("ol", { className: "relative border-l-2 border-ink-100 ml-3 space-y-4", children: [(timeline.events || []).map((e, i) => (_jsxs("li", { className: "ml-4 pl-2", children: [_jsx("div", { className: "absolute -left-[7px] size-3 rounded-full bg-brand-500 ring-2 ring-white" }), _jsxs("div", { className: "flex items-center justify-between gap-3", children: [_jsxs("div", { children: [_jsx("div", { className: "text-sm text-ink-800 font-medium", children: e.kind === "appointment" ? `Appointment ${e.code || ""}` : `KYC ${e.status}` }), _jsx("div", { className: "text-xs text-ink-500 font-mono", children: e.at?.slice(0, 16).replace("T", " ") })] }), e.status && _jsx(Badge, { tone: statusTone(e.status), children: e.status.replaceAll("_", " ") })] })] }, i))), !(timeline.events || []).length && (_jsx("li", { className: "ml-4 text-sm text-ink-500", children: "No activity yet." }))] })) : _jsx(SkelLine, {}) })] }), patient && (_jsx(NewPatientModal, { open: editOpen, onClose: () => setEditOpen(false), existing: patient })), patient && (_jsx(MoveTenantDialog, { open: moveOpen, onClose: () => setMoveOpen(false), entityKind: "patient", entityId: patient.id, entityName: patient.full_name_en || patient.code, currentTenantId: patient.tenant_id }))] }));
+}
+function Detail({ icon, label, value, mono }) {
+    return (_jsxs("div", { children: [_jsxs("div", { className: "text-[11px] text-ink-500 uppercase tracking-wider flex items-center gap-1", children: [_jsx("span", { className: "text-ink-400", children: icon }), label] }), _jsx("div", { className: `mt-0.5 text-ink-800 font-medium ${mono ? "font-mono text-xs" : ""}`, children: value || "—" })] }));
+}
+function TagGroup({ icon, label, items, tone, }) {
+    return (_jsxs("div", { children: [_jsxs("div", { className: "text-xs font-semibold text-ink-700 flex items-center gap-1 mb-1", children: [icon, " ", label] }), items && items.length > 0 ? (_jsx("div", { className: "flex flex-wrap gap-1", children: items.map((item) => (_jsx("span", { className: `text-xs px-2 py-0.5 rounded-full ring-1 ring-inset ${tone}`, children: item }, item))) })) : (_jsx("div", { className: "text-xs text-ink-400", children: "None" }))] }));
+}
+const SkelLine = () => _jsx("div", { className: "h-16 bg-ink-100 rounded animate-pulse" });

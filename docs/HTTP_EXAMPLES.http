@@ -1,0 +1,103 @@
+### Sample HTTP requests (compatible with VSCode REST Client / IntelliJ HTTP)
+### Base URL
+@host = http://localhost:5000/api/v1
+
+### Login (returns access + refresh tokens)
+# @name login
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "secretary@medme.ai",
+  "password": "ChangeMe!123"
+}
+
+###
+@access = {{login.response.body.access_token}}
+@refresh = {{login.response.body.refresh_token}}
+
+### Me
+GET {{host}}/auth/me
+Authorization: Bearer {{access}}
+
+### Refresh
+POST {{host}}/auth/refresh
+Authorization: Bearer {{refresh}}
+
+### List patients
+GET {{host}}/patients/?q=ahmad
+Authorization: Bearer {{access}}
+
+### Create patient
+POST {{host}}/patients/
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{
+  "full_name_en": "Test Patient",
+  "phone": "0790000001",
+  "gender": "male",
+  "consent_treatment": true
+}
+
+### Inquiry by phone (used by AI + global search)
+GET {{host}}/appointments/inquire?phone=0791234567
+Authorization: Bearer {{access}}
+
+### Doctor availability
+GET {{host}}/doctors/1/availability?date_from=2026-05-14&date_to=2026-05-21
+Authorization: Bearer {{access}}
+
+### Book appointment
+POST {{host}}/appointments/
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{
+  "patient_id": 1,
+  "doctor_id": 1,
+  "branch_id": 1,
+  "starts_at": "2026-05-15T10:00:00Z",
+  "reason": "Routine checkup",
+  "source_channel": "secretary"
+}
+
+### Confirm appointment
+POST {{host}}/appointments/1/confirm
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{}
+
+### Cancel appointment
+POST {{host}}/appointments/1/cancel
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{ "reason": "patient_request" }
+
+### Insurance acceptance check
+GET {{host}}/insurance/appointments/1/check
+Authorization: Bearer {{access}}
+
+### KYC queue
+GET {{host}}/kyc/queue
+Authorization: Bearer {{access}}
+
+### Reports overview
+GET {{host}}/reports/overview
+Authorization: Bearer {{access}}
+
+### AI chat — secretary persona
+POST {{host}}/ai/chat
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{ "message": "Search appointments for phone 0791234567" }
+
+### AI chat — confirm a destructive action
+POST {{host}}/ai/chat/1/confirm
+Authorization: Bearer {{access}}
+Content-Type: application/json
+
+{ "token": "<token-from-pending_confirmation>", "decision": "yes" }

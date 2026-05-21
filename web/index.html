@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Favicon (SVG for modern browsers) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PWA theme color -->
+    <meta name="theme-color" content="#0ea5a8" />
+
+    <!-- iOS "Add to Home Screen" support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="MedMeAI" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+
+    <!-- Microsoft / Edge tile -->
+    <meta name="msapplication-TileColor" content="#0ea5a8" />
+
+    <title>MedMeAI</title>
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <div id="root"></div>
+    <!--
+      Eruda mobile in-page DevTools. Loads ONLY when the URL has ?debug=1
+      (so production users never see it). Useful for diagnosing API calls on
+      iOS Safari where there's no built-in DevTools. Adds a floating circle in
+      the corner — tap it to open a console + network panel.
+    -->
+    <script>
+      if (location.search.includes("debug=1")) {
+        const s = document.createElement("script");
+        s.src = "https://cdn.jsdelivr.net/npm/eruda";
+        s.onload = function () { window.eruda && window.eruda.init(); };
+        document.head.appendChild(s);
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

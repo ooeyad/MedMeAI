@@ -1,0 +1,4 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export function PageHeader({ title, subtitle, icon, actions, }) {
+    return (_jsxs("div", { className: "flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-3 sm:gap-4 mb-6", children: [_jsxs("div", { className: "flex items-center gap-3 min-w-0", children: [icon && (_jsx("div", { className: "size-11 rounded-xl bg-brand-gradient text-white grid place-items-center shadow-soft shrink-0", children: icon })), _jsxs("div", { className: "min-w-0", children: [_jsx("h1", { className: "text-xl sm:text-2xl font-semibold text-ink-900 tracking-tight truncate", children: title }), subtitle && _jsx("p", { className: "text-sm text-ink-500 mt-0.5", children: subtitle })] })] }), actions && (_jsx("div", { className: "flex flex-wrap items-center gap-2 w-full sm:w-auto", children: actions }))] }));
+}
